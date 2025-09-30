@@ -1,0 +1,13 @@
+port: ":5700"
+app-name: "golang-api-starter"
+mode: "debug"
+db:
+  username: localenv
+  password: localenv
+  host: localhost
+  port: 5400
+  name: localenv
+  version: 1
+
+jeager:
+  url: "http://localhost:14268/api/traces"
