@@ -59,5 +59,8 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 			return
 		}
 	})
+	e.GET("/panic", func(ctx *gin.Context) {
+		panic("server recovery")
+	})
 	return e
 }
