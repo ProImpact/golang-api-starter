@@ -2,6 +2,7 @@ package midleware
 
 import (
 	"apistarter/pkg/model"
+	"apistarter/pkg/utils"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,7 +18,7 @@ func Recovery() gin.HandlerFunc {
 			Details:   map[string]any{"error": fmt.Sprintf("%v", recovered)},
 			TimeStamp: time.Now(),
 			Path:      c.Request.URL.Path,
-			RequestId: GetRequestID(c),
+			RequestId: utils.GetRequestID(c),
 			Status:    http.StatusInternalServerError,
 			Fault:     "server",
 		}

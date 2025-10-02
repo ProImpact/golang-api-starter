@@ -1,6 +1,7 @@
 package config
 
 import (
+	"apistarter/internal/env"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -14,8 +15,8 @@ type Configuration struct {
 	DatabaseConfig DatabaseConfig
 	Mode           string
 	AppName        string
-	JeagerUrl      string
 	AllowedOrigins []string
+	Key            string
 }
 
 type DatabaseConfig struct {
@@ -51,8 +52,10 @@ func NewConfiguration() *Configuration {
 	cfg.DatabaseConfig.Version = viper.GetInt("db.version")
 	cfg.Mode = viper.GetString("mode")
 	cfg.AppName = viper.GetString("app-name")
-	cfg.JeagerUrl = viper.GetString("jeager.url")
 	cfg.AllowedOrigins = viper.GetStringSlice("allowed_origins")
+	cfg.Key = viper.GetString("key")
+	env.KEY = cfg.Key
+	env.APP_NAME = cfg.AppName
 	slog.Info("allowed origins", "origins", strings.Join(cfg.AllowedOrigins, ","))
 	gin.SetMode(cfg.Mode)
 	return &cfg

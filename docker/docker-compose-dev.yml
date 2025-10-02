@@ -13,25 +13,5 @@ services:
     volumes:
       - apidata:/var/lib/postgresql/data # Mount a named volume 'apidata' to persist database files outside the container
 
-  jaeger: # Jaeger tracing backend service
-    image: cr.jaegertracing.io/jaegertracing/jaeger:2.8.0  
-    # image: jaegertracing/all-in-one:1.58 # Alternative: Use a specific version like '1.58'
-    restart: unless-stopped # Always restart the container unless it's explicitly stopped
-    environment:
-      # Optional: Configure sampling rate (0.0 - 1.0, 1.0 = 100%)
-      - "COLLECTOR_OTLP_ENABLED=true" # Enable the OpenTelemetry Protocol (OTLP) receiver (recommended for OpenTelemetry)
-      # - "QUERY_BASE_PATH=/jaeger" # Optional: Change the base path for the Jaeger UI
-    ports:
-      # Port for the agent (receives traces via UDP, legacy protocols)
-      - "5775:5775/udp"
-      # Port for the HTTP collector (legacy)
-      - "14268:14268" # This is the endpoint used in the Go code: http://localhost:14268/api/traces
-      # Port for the gRPC collector (legacy)
-      - "14250:14250"
-      # Port for the Jaeger UI
-      - "16686:16686"
-      # Port for the Zipkin protocol (if used)
-      - "9411:9411"
-
 volumes:
   apidata: {} # Define the named volume 'apidata' used by the 'db' service

@@ -3,6 +3,7 @@ package server
 import (
 	"apistarter/internal/config"
 	"apistarter/internal/db"
+	"apistarter/internal/security"
 	"apistarter/internal/server/midleware"
 	"apistarter/internal/server/response"
 	"apistarter/internal/validation"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
@@ -61,6 +63,29 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 	})
 	e.GET("/panic", func(ctx *gin.Context) {
 		panic("server recovery")
+	})
+	e.GET("/token", func(ctx *gin.Context) {
+		token, err := security.GenerateToken(uuid.NewString(), time.Minute)
+		if err != nil {
+			response.Error(
+				ctx,
+				http.StatusForbidden,
+				model.ACCESS_DENIED,
+				"error generating the token for the user",
+				map[string]any{
+					"error": err.Error(),
+				},
+			)
+			return
+		}
+		response.Success(
+			ctx,
+			map[string]any{
+				"token": token,
+			},
+			"jwt token generated",
+			nil,
+		)
 	})
 	return e
 }

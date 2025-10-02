@@ -1,8 +1,8 @@
 package response
 
 import (
-	"apistarter/internal/server/midleware"
 	"apistarter/pkg/model"
+	"apistarter/pkg/utils"
 	"net/http"
 	"time"
 
@@ -20,7 +20,7 @@ func Error(c *gin.Context, status int, code model.ErrorCode, message string, det
 		Details:   details,
 		TimeStamp: time.Now().UTC(),
 		Path:      c.Request.URL.Path,
-		RequestId: midleware.GetRequestID(c),
+		RequestId: utils.GetRequestID(c),
 		Status:    status,
 		Fault:     fault,
 	}
@@ -32,7 +32,7 @@ func Success(c *gin.Context, data any, message string, meta map[string]any) {
 		Data:      data,
 		Message:   message,
 		Meta:      meta,
-		RequestId: midleware.GetRequestID(c),
+		RequestId: utils.GetRequestID(c),
 		TimeStamp: time.Now().UTC(),
 	}
 	c.JSON(http.StatusOK, resp)
