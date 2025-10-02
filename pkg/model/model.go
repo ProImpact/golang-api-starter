@@ -14,3 +14,11 @@ type RequestErr struct {
 	Status    int            `json:"status,omitempty"`
 	Fault     string         `json:"fault,omitempty"` // server | client
 }
+
+type Success struct {
+	Data      any            `json:"data,omitempty"`
+	Message   string         `json:"message,omitempty"`
+	Meta      map[string]any `json:"meta,omitempty"`
+	RequestId string         `json:"request_id,omitempty"`
+	TimeStamp time.Time      `json:"time_stamp,omitempty"`
+}

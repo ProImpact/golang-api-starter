@@ -1,8 +1,9 @@
-package app
+package response
 
 import (
 	"apistarter/internal/server/midleware"
 	"apistarter/pkg/model"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,4 +25,15 @@ func Error(c *gin.Context, status int, code model.ErrorCode, message string, det
 		Fault:     fault,
 	}
 	c.JSON(status, err)
+}
+
+func Success(c *gin.Context, data any, message string, meta map[string]any) {
+	resp := model.Success{
+		Data:      data,
+		Message:   message,
+		Meta:      meta,
+		RequestId: midleware.GetRequestID(c),
+		TimeStamp: time.Now().UTC(),
+	}
+	c.JSON(http.StatusOK, resp)
 }
