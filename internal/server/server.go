@@ -5,6 +5,9 @@ import (
 	"apistarter/internal/db"
 	"apistarter/internal/server/midleware"
 	"apistarter/internal/server/response"
+	"apistarter/internal/validation"
+	"apistarter/pkg/model"
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -26,6 +29,35 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 	e.GET("/", func(ctx *gin.Context) {
 		data, _ := q.GetApplicationName(ctx)
 		response.Success(ctx, data, "user created", nil)
+	})
+	e.POST("/", func(ctx *gin.Context) {
+		var a validation.Address
+		err := ctx.ShouldBindBodyWithJSON(&a)
+		if err != nil {
+			response.Error(
+				ctx,
+				http.StatusBadRequest,
+				model.INVALID_FORMAT,
+				"error parsing the json body",
+				map[string]any{
+					"error": err.Error(),
+				},
+			)
+			return
+		}
+		err = a.Validate()
+		if err != nil {
+			response.Error(
+				ctx,
+				http.StatusBadRequest,
+				model.FIELD_VALIDATION_ERROR,
+				"error validating the json payload",
+				map[string]any{
+					"error": err,
+				},
+			)
+			return
+		}
 	})
 	return e
 }
