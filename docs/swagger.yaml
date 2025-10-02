@@ -1,7 +1,18 @@
+basePath: /api/v1
+host: localhost:8080
 info:
   contact: {}
-  description: Plantilla base para APIs
+  description: A production-ready starter template for building REST APIs in Go.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
   title: Golang API Starter
   version: 1.0.0
 paths: {}
+securityDefinitions:
+  Bearer:
+    description: 'JWT token. Example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
