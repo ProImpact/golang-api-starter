@@ -8,3 +8,6 @@ docker:
 
 compile_sql:
 	sqlc generate
+
+gen_docs:
+	swag init --dir cmd/api --parseInternal --parseDepth 10

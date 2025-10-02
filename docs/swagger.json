@@ -1,0 +1,10 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Plantilla base para APIs",
+        "title": "Golang API Starter",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "paths": {}
+}

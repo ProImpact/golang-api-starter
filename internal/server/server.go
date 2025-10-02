@@ -3,6 +3,7 @@ package server
 import (
 	"apistarter/internal/config"
 	"apistarter/internal/db"
+	"apistarter/internal/metrics"
 	"apistarter/internal/security"
 	"apistarter/internal/server/midleware"
 	"apistarter/internal/server/response"
@@ -11,16 +12,22 @@ import (
 	"net/http"
 	"time"
 
+	_ "apistarter/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
-	e := gin.Default()
-	e.Use(midleware.Recovery())
-	e.Use(midleware.RequestID())
-	e.Use(cors.New(cors.Config{
+	router := gin.New()
+	router.Use(midleware.Recovery())
+	router.Use(midleware.RequestID())
+	router.GET("/metrics", metrics.Handler())
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.Use(cors.New(cors.Config{
 		AllowOrigins:     cfg.AllowedOrigins,
 		AllowMethods:     []string{"PUT", "PATCH"},
 		AllowHeaders:     []string{"Origin"},
@@ -28,11 +35,11 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	e.GET("/", func(ctx *gin.Context) {
+	router.GET("/", func(ctx *gin.Context) {
 		data, _ := q.GetApplicationName(ctx)
 		response.Success(ctx, data, "user created", nil)
 	})
-	e.POST("/", func(ctx *gin.Context) {
+	router.POST("/", func(ctx *gin.Context) {
 		var a validation.Address
 		err := ctx.ShouldBindBodyWithJSON(&a)
 		if err != nil {
@@ -61,10 +68,10 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 			return
 		}
 	})
-	e.GET("/panic", func(ctx *gin.Context) {
+	router.GET("/panic", func(ctx *gin.Context) {
 		panic("server recovery")
 	})
-	e.GET("/token", func(ctx *gin.Context) {
+	router.GET("/token", func(ctx *gin.Context) {
 		token, err := security.GenerateToken(uuid.NewString(), time.Minute)
 		if err != nil {
 			response.Error(
@@ -87,5 +94,5 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 			nil,
 		)
 	})
-	return e
+	return router
 }

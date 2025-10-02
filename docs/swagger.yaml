@@ -1,0 +1,7 @@
+info:
+  contact: {}
+  description: Plantilla base para APIs
+  title: Golang API Starter
+  version: 1.0.0
+paths: {}
+swagger: "2.0"
