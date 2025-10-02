@@ -11,6 +11,8 @@ services:
       - POSTGRES_DB=localenv
     volumes:
       - apidata:/var/lib/postgresql/data
+    networks:
+      - observability-net
 
   # Valkey service (Redis-compatible in-memory data store)
   valkey:
@@ -25,7 +27,30 @@ services:
     command: ["valkey-server", "/etc/valkey/valkey.conf"]
     environment:
       - VALKEY_PASSWORD=localenv
+    networks:
+      - observability-net
+
+  # Jaeger for distributed tracing
+  jaeger:
+    image: cr.jaegertracing.io/jaegertracing/jaeger:2.8.0
+    container_name: jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"    # Web UI
+      - "4318:4318"      # OTLP HTTP
+      - "4317:4317"      # OTLP gRPC
+      - "14268:14268"    # Jaeger HTTP
+      - "14250:14250"    # Jaeger gRPC
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=debug
+    networks:
+      - observability-net
 
 volumes:
   apidata: {}
   valkey_data: {}
+
+networks:
+  observability-net:
+    driver: bridge

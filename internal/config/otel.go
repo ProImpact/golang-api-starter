@@ -15,15 +15,17 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	"go.opentelemetry.io/otel/trace"
 
 	golog "log"
 )
 
-func NewOtelSdk(ctx context.Context, closer *sd.ShutdownManager) {
+func NewOtelSdk(ctx context.Context, closer *sd.ShutdownManager) trace.Tracer {
+	tracer := otel.Tracer("apistarter")
 	// Skip initialization if disabled
 	if os.Getenv("OTEL_ENABLED") != "true" {
 		golog.Println("🔕 OpenTelemetry disabled (OTEL_ENABLED != true)")
-		return
+		return nil
 	}
 
 	var shutdownFuncs []func(context.Context) error
@@ -47,7 +49,7 @@ func NewOtelSdk(ctx context.Context, closer *sd.ShutdownManager) {
 	res, err := createResource(ctx)
 	if err != nil {
 		golog.Printf("⚠️ Failed to create OpenTelemetry resource: %v", err)
-		return
+		return tracer
 	}
 
 	// Set up trace provider with OTLP
@@ -72,6 +74,7 @@ func NewOtelSdk(ctx context.Context, closer *sd.ShutdownManager) {
 
 	golog.Println("✅ OpenTelemetry fully initialized with OTLP")
 	closer.CleanupFuncsWithContext = append(closer.CleanupFuncsWithContext, shutdown)
+	return tracer
 }
 
 func createResource(ctx context.Context) (*resource.Resource, error) {
@@ -102,7 +105,6 @@ func newTracerProvider(ctx context.Context, res *resource.Resource) (*sdktrace.T
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(res),
-		// Sampling - adjust based on needs
 		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.TraceIDRatioBased(1.0))),
 	)
 	return tracerProvider, nil
@@ -113,6 +115,7 @@ func newMetricProvider(ctx context.Context, res *resource.Resource) (*sdkmetric.
 	exporter, err := otlpmetrichttp.New(ctx,
 		otlpmetrichttp.WithEndpoint("localhost:4318"), // OTLP HTTP endpoint
 		otlpmetrichttp.WithInsecure(),                 // Use WithTLS() in production
+		otlpmetrichttp.WithURLPath("/v1/traces"),      // OTLP path
 	)
 	if err != nil {
 		return nil, err

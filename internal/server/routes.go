@@ -19,9 +19,11 @@ import (
 	"github.com/google/uuid"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
-func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
+func NewRouter(q *db.Queries, cfg *config.Configuration, tracer trace.Tracer) *gin.Engine {
 	router := gin.New()
 	router.Use(midleware.Recovery())
 	router.Use(midleware.RequestID())
@@ -69,7 +71,17 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 		}
 	})
 	router.GET("/panic", func(ctx *gin.Context) {
-		panic("server recovery")
+		_, span := tracer.Start(ctx.Request.Context(), "panic")
+		defer span.End()
+
+		userID := "123"
+
+		span.SetAttributes(
+			attribute.String("http.method", ctx.Request.Method),
+			attribute.String("http.route", "/panic"),
+			attribute.String("user.id", userID),
+		)
+		panic("random error")
 	})
 	router.GET("/token", func(ctx *gin.Context) {
 		token, err := security.GenerateToken(uuid.NewString(), time.Minute)
