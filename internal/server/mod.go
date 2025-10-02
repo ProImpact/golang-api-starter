@@ -4,7 +4,6 @@ import (
 	"apistarter/internal/config"
 	"apistarter/internal/shutdown"
 	"context"
-	"fmt"
 	"log/slog"
 	"net"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 )
 
 var Mod = fx.Options(
@@ -19,7 +19,13 @@ var Mod = fx.Options(
 	fx.Provide(NewHttpServer),
 )
 
-func NewHttpServer(lc fx.Lifecycle, router *gin.Engine, cfg *config.Configuration, shutDown *shutdown.ShutdownManager) *http.Server {
+func NewHttpServer(
+	lc fx.Lifecycle,
+	router *gin.Engine,
+	cfg *config.Configuration, shutDown *shutdown.ShutdownManager,
+	logger *zap.Logger,
+) *http.Server {
+
 	s := &http.Server{
 		Addr:           cfg.Port,
 		Handler:        router,
@@ -34,12 +40,12 @@ func NewHttpServer(lc fx.Lifecycle, router *gin.Engine, cfg *config.Configuratio
 			if err != nil {
 				return err
 			}
-			fmt.Println("Starting HTTP server at", s.Addr)
+			logger.Info("Starting HTTP server at", zap.String("port", s.Addr))
 			go s.Serve(ln)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			slog.Info("app shutdown activated")
+			logger.Info("app shutdown activated")
 			var err error
 			for _, clean := range shutDown.CleanupFuncs {
 				err = clean()
