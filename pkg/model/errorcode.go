@@ -1,0 +1,56 @@
+package model
+
+type ErrorCode string
+
+func (e ErrorCode) String() string {
+	return string(e)
+}
+
+const (
+	INVALID_ARGUMENT                ErrorCode = "INVALID_ARGUMENT"
+	VALIDATION_ERROR                ErrorCode = "VALIDATION_ERROR"
+	FIELD_VALIDATION_ERROR          ErrorCode = "FIELD_VALIDATION_ERROR"
+	MISSING_REQUIRED_FIELD          ErrorCode = "MISSING_REQUIRED_FIELD"
+	INVALID_FORMAT                  ErrorCode = "INVALID_FORMAT"
+	INVALID_VALUE                   ErrorCode = "INVALID_VALUE"
+	OUT_OF_RANGE                    ErrorCode = "OUT_OF_RANGE"
+	INVALID_PARAMETER_COMBINATION   ErrorCode = "INVALID_PARAMETER_COMBINATION"
+	NOT_FOUND                       ErrorCode = "NOT_FOUND"
+	RESOURCE_NOT_FOUND              ErrorCode = "RESOURCE_NOT_FOUND"
+	ALREADY_EXISTS                  ErrorCode = "ALREADY_EXISTS"
+	CONFLICT                        ErrorCode = "CONFLICT"
+	UNAUTHENTICATED                 ErrorCode = "UNAUTHENTICATED"
+	UNAUTHORIZED                    ErrorCode = "UNAUTHORIZED"
+	PERMISSION_DENIED               ErrorCode = "PERMISSION_DENIED"
+	ACCESS_DENIED                   ErrorCode = "ACCESS_DENIED"
+	TOO_MANY_REQUESTS               ErrorCode = "TOO_MANY_REQUESTS"
+	RATE_LIMIT_EXCEEDED             ErrorCode = "RATE_LIMIT_EXCEEDED"
+	QUOTA_EXCEEDED                  ErrorCode = "QUOTA_EXCEEDED"
+	INTERNAL_ERROR                  ErrorCode = "INTERNAL_ERROR"
+	SERVICE_UNAVAILABLE             ErrorCode = "SERVICE_UNAVAILABLE"
+	BAD_GATEWAY                     ErrorCode = "BAD_GATEWAY"
+	MALFORMED_REQUEST               ErrorCode = "MALFORMED_REQUEST"
+	UNSUPPORTED_OPERATION           ErrorCode = "UNSUPPORTED_OPERATION"
+	PRECONDITION_FAILED             ErrorCode = "PRECONDITION_FAILED"
+	INSUFFICIENT_FUNDS              ErrorCode = "INSUFFICIENT_FUNDS"
+	ACCOUNT_LOCKED                  ErrorCode = "ACCOUNT_LOCKED"
+	ACCOUNT_INACTIVE                ErrorCode = "ACCOUNT_INACTIVE"
+	ACCOUNT_NOT_VERIFIED            ErrorCode = "ACCOUNT_NOT_VERIFIED"
+	EMAIL_ALREADY_VERIFIED          ErrorCode = "EMAIL_ALREADY_VERIFIED"
+	INVALID_CREDENTIALS             ErrorCode = "INVALID_CREDENTIALS"
+	PASSWORD_RESET_EXPIRED          ErrorCode = "PASSWORD_RESET_EXPIRED"
+	INVALID_OTP                     ErrorCode = "INVALID_OTP"
+	OTP_ATTEMPTS_EXCEEDED           ErrorCode = "OTP_ATTEMPTS_EXCEEDED"
+	USER_NOT_OWNER                  ErrorCode = "USER_NOT_OWNER"
+	ACTION_NOT_ALLOWED              ErrorCode = "ACTION_NOT_ALLOWED"
+	RESOURCE_IN_USE                 ErrorCode = "RESOURCE_IN_USE"
+	DEPENDENCY_CONSTRAINT_VIOLATION ErrorCode = "DEPENDENCY_CONSTRAINT_VIOLATION"
+	INVALID_STATE_TRANSITION        ErrorCode = "INVALID_STATE_TRANSITION"
+	ORDER_ALREADY_PAID              ErrorCode = "ORDER_ALREADY_PAID"
+	ORDER_CANNOT_BE_CANCELLED       ErrorCode = "ORDER_CANNOT_BE_CANCELLED"
+	SUBSCRIPTION_NOT_ACTIVE         ErrorCode = "SUBSCRIPTION_NOT_ACTIVE"
+	TRIAL_PERIOD_EXPIRED            ErrorCode = "TRIAL_PERIOD_EXPIRED"
+	MAX_ENTITIES_LIMIT_REACHED      ErrorCode = "MAX_ENTITIES_LIMIT_REACHED"
+	DUPLICATE_ACTION                ErrorCode = "DUPLICATE_ACTION"
+	BUSINESS_RULE_VIOLATION         ErrorCode = "BUSINESS_RULE_VIOLATION"
+)
