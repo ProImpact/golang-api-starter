@@ -19,7 +19,6 @@ import (
 	"github.com/google/uuid"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -29,6 +28,7 @@ func NewRouter(q *db.Queries, cfg *config.Configuration, tracer trace.Tracer) *g
 	router.Use(midleware.RequestID())
 	router.GET("/metrics", metrics.Handler())
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.Use(midleware.TracingMiddleware(tracer))
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     cfg.AllowedOrigins,
 		AllowMethods:     []string{"PUT", "PATCH"},
@@ -71,17 +71,7 @@ func NewRouter(q *db.Queries, cfg *config.Configuration, tracer trace.Tracer) *g
 		}
 	})
 	router.GET("/panic", func(ctx *gin.Context) {
-		_, span := tracer.Start(ctx.Request.Context(), "panic")
-		defer span.End()
-
-		userID := "123"
-
-		span.SetAttributes(
-			attribute.String("http.method", ctx.Request.Method),
-			attribute.String("http.route", "/panic"),
-			attribute.String("user.id", userID),
-		)
-		panic("random error")
+		panic("strange error")
 	})
 	router.GET("/token", func(ctx *gin.Context) {
 		token, err := security.GenerateToken(uuid.NewString(), time.Minute)
