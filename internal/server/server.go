@@ -38,7 +38,7 @@ func NewRouter(q *db.Queries, cfg *config.Configuration) *gin.Engine {
 				ctx,
 				http.StatusBadRequest,
 				model.INVALID_FORMAT,
-				"error parsing the json body",
+				"error parsing the request to json",
 				map[string]any{
 					"error": err.Error(),
 				},
