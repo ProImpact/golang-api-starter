@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -25,10 +26,11 @@ func NewHttpServer(
 	cfg *config.Configuration, shutDown *shutdown.ShutdownManager,
 	logger *zap.Logger,
 ) *http.Server {
-
+	// add instrumentation to the hole app
+	handler := otelhttp.NewHandler(router, "/")
 	s := &http.Server{
 		Addr:           cfg.Port,
-		Handler:        router,
+		Handler:        handler,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -49,6 +51,12 @@ func NewHttpServer(
 			var err error
 			for _, clean := range shutDown.CleanupFuncs {
 				err = clean()
+				if err != nil {
+					slog.Error(err.Error())
+				}
+			}
+			for _, clean := range shutDown.CleanupFuncsWithContext {
+				err = clean(ctx)
 				if err != nil {
 					slog.Error(err.Error())
 				}
