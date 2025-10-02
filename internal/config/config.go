@@ -17,6 +17,7 @@ type Configuration struct {
 	AppName        string
 	AllowedOrigins []string
 	Key            string
+	Redis         Redis
 }
 
 type DatabaseConfig struct {
@@ -26,6 +27,11 @@ type DatabaseConfig struct {
 	Port         int
 	DatabaseName string
 	Version      int
+}
+
+type Redis struct {
+	Url      string
+	Password string
 }
 
 func init() {
@@ -54,6 +60,8 @@ func NewConfiguration() *Configuration {
 	cfg.AppName = viper.GetString("app-name")
 	cfg.AllowedOrigins = viper.GetStringSlice("allowed_origins")
 	cfg.Key = viper.GetString("key")
+	cfg.Redis.Url = viper.GetString("valkey.url")
+	cfg.Redis.Password = viper.GetString("valkey.password")
 	env.KEY = cfg.Key
 	env.APP_NAME = cfg.AppName
 	slog.Info("allowed origins", "origins", strings.Join(cfg.AllowedOrigins, ","))

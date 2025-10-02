@@ -12,3 +12,8 @@ db:
 
 allowed_origins:
   - http://localhost:8080
+
+
+redis:
+  url: "localhost:6379"
+  password: "localenv"

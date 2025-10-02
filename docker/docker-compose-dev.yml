@@ -1,17 +1,31 @@
-version: '3.8'
-
 services:
-  db: # Database service
-    image: docker.io/library/postgres:alpine # Use the official PostgreSQL image with Alpine Linux
-    container_name: api_db # Assign a specific name to the container for easier identification
+  # Database service
+  db:
+    image: docker.io/library/postgres:alpine
+    container_name: api_db
     ports:
-      - 5400:5432 # Map port 5400 on the host to port 5432 inside the container (default PostgreSQL port)
+      - "5400:5432"
     environment:
-      - POSTGRES_USER=localenv # Set the default PostgreSQL user (can be overridden by environment variables)
-      - POSTGRES_PASSWORD=localenv # Set the password for the default user (can be overridden)
-      - POSTGRES_DB=localenv # Set the default database name (can be overridden)
+      - POSTGRES_USER=localenv
+      - POSTGRES_PASSWORD=localenv
+      - POSTGRES_DB=localenv
     volumes:
-      - apidata:/var/lib/postgresql/data # Mount a named volume 'apidata' to persist database files outside the container
+      - apidata:/var/lib/postgresql/data
+
+  # Valkey service (Redis-compatible in-memory data store)
+  valkey:
+    image: docker.io/valkey/valkey:8.1.3-alpine
+    container_name: valkey
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+      - ./valkey.conf:/etc/valkey/valkey.conf
+    command: ["valkey-server", "/etc/valkey/valkey.conf"]
+    environment:
+      - VALKEY_PASSWORD=localenv
 
 volumes:
-  apidata: {} # Define the named volume 'apidata' used by the 'db' service
+  apidata: {}
+  valkey_data: {}
