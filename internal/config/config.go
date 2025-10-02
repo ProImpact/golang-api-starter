@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ type Configuration struct {
 	Mode           string
 	AppName        string
 	JeagerUrl      string
+	AllowedOrigins []string
 }
 
 type DatabaseConfig struct {
@@ -50,6 +52,8 @@ func NewConfiguration() *Configuration {
 	cfg.Mode = viper.GetString("mode")
 	cfg.AppName = viper.GetString("app-name")
 	cfg.JeagerUrl = viper.GetString("jeager.url")
+	cfg.AllowedOrigins = viper.GetStringSlice("allowed_origins")
+	slog.Info("allowed origins", "origins", strings.Join(cfg.AllowedOrigins, ","))
 	gin.SetMode(cfg.Mode)
 	return &cfg
 }
