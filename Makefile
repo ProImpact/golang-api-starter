@@ -1,6 +1,9 @@
+GIT_TAG := $(shell git describe --tags --always)
+BUILD_TIME := $(shell TZ='America/Los_Angeles' date -u +"%c")
+
 
 run:
-	air
+	GIT_TAG="$(GIT_TAG)" BUILD_TIME="$(BUILD_TIME)" air
 
 .PHONY: docker
 docker:

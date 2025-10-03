@@ -10,6 +10,7 @@ import (
 	"apistarter/internal/validation"
 	"apistarter/pkg/model"
 	"net/http"
+	"os"
 	"time"
 
 	_ "apistarter/docs"
@@ -21,6 +22,8 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.opentelemetry.io/otel/trace"
 )
+
+var now = time.Now()
 
 func NewRouter(q *db.Queries, cfg *config.Configuration, tracer trace.Tracer) *gin.Engine {
 	router := gin.New()
@@ -70,8 +73,12 @@ func NewRouter(q *db.Queries, cfg *config.Configuration, tracer trace.Tracer) *g
 			return
 		}
 	})
-	router.GET("/panic", func(ctx *gin.Context) {
-		panic("strange error")
+	router.GET("/version", func(ctx *gin.Context) {
+		response.Success(ctx, map[string]string{
+			"version":    os.Getenv("GIT_TAG"),
+			"build_time": os.Getenv("BUILD_TIME"),
+			"up_time":    time.Since(now).String(),
+		}, "API version", nil)
 	})
 	router.GET("/token", func(ctx *gin.Context) {
 		token, err := security.GenerateToken(uuid.NewString(), time.Minute)
