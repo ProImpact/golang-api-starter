@@ -37,3 +37,27 @@ func Success(c *gin.Context, data any, message string, meta map[string]any) {
 	}
 	c.JSON(http.StatusOK, resp)
 }
+
+func InvalidJsonPayload(ctx *gin.Context, err error) {
+	Error(
+		ctx,
+		http.StatusBadRequest,
+		model.INVALID_REQUEST,
+		"error parsing the request to json",
+		map[string]any{
+			"error": err.Error(),
+		},
+	)
+}
+
+func ValidationError(ctx *gin.Context, err error) {
+	Error(
+		ctx,
+		http.StatusBadRequest,
+		model.FIELD_VALIDATION_ERROR,
+		"error validating the json payload",
+		map[string]any{
+			"error": err,
+		},
+	)
+}
