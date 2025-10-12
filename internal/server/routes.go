@@ -29,6 +29,10 @@ func NewRouter(q *db.Queries, cfg *config.Configuration, tracer trace.Tracer) *g
 	router := gin.New()
 	router.Use(midleware.Recovery())
 	router.Use(midleware.RequestID())
+	router.Use(metrics.Middleware())
+	router.NoRoute(func(ctx *gin.Context) {
+		response.Error(ctx, http.StatusNotFound, model.NOT_FOUND, "route not found", nil)
+	})
 	router.GET("/metrics", metrics.Handler())
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Use(midleware.TracingMiddleware(tracer))

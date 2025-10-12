@@ -7,8 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/NetsyAi/realstate/internal/server/response"
-	"github.com/NetsyAi/realstate/pkg/model"
+	"apistarter/internal/server/response"
+	"apistarter/pkg/model"
+
 	"github.com/gin-gonic/gin"
 )
 

@@ -61,3 +61,15 @@ func ValidationError(ctx *gin.Context, err error) {
 		},
 	)
 }
+
+func QueryValidationError(ctx *gin.Context, err error) {
+	Error(
+		ctx,
+		http.StatusBadRequest,
+		model.FIELD_VALIDATION_ERROR,
+		"error validating the query params",
+		map[string]any{
+			"error": err,
+		},
+	)
+}
