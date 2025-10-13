@@ -13,8 +13,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Validable interface {
+	Validate() error
+}
+
 // IsValidRequest unmarchasll into data and checks if the request is valid and send back the proper error messaje
-func IsValidRequest[T any](ctx *gin.Context, data T) bool {
+func IsValidRequest[T Validable](ctx *gin.Context, data T) bool {
 	err := json.NewDecoder(ctx.Request.Body).Decode(&data)
 	if err != nil {
 		var syntaxError *json.SyntaxError
@@ -79,6 +83,11 @@ func IsValidRequest[T any](ctx *gin.Context, data T) bool {
 			)
 			return false
 		}
+	}
+	err = data.Validate()
+	if err != nil {
+		response.ValidationError(ctx, err)
+		return false
 	}
 	return true
 }

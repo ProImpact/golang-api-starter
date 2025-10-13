@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func Error(c *gin.Context, status int, code model.ErrorCode, message string, details map[string]any) {
@@ -45,7 +46,8 @@ func InvalidJsonPayload(ctx *gin.Context, err error) {
 		model.INVALID_REQUEST,
 		"error parsing the request to json",
 		map[string]any{
-			"error": err.Error(),
+			"error":  err.Error(),
+			"method": ctx.Request.Method,
 		},
 	)
 }
@@ -57,7 +59,21 @@ func ValidationError(ctx *gin.Context, err error) {
 		model.FIELD_VALIDATION_ERROR,
 		"error validating the json payload",
 		map[string]any{
-			"error": err,
+			"error":  err,
+			"method": ctx.Request.Method,
+		},
+	)
+}
+
+func ValidationErrorMsg(ctx *gin.Context, err error) {
+	Error(
+		ctx,
+		http.StatusBadRequest,
+		model.FIELD_VALIDATION_ERROR,
+		"error validating the json payload",
+		map[string]any{
+			"error":  err.Error(),
+			"method": ctx.Request.Method,
 		},
 	)
 }
@@ -69,7 +85,25 @@ func QueryValidationError(ctx *gin.Context, err error) {
 		model.FIELD_VALIDATION_ERROR,
 		"error validating the query params",
 		map[string]any{
-			"error": err,
+			"error":  err,
+			"method": ctx.Request.Method,
 		},
 	)
+}
+
+func InternalServerError(ctx *gin.Context, err error) {
+	Error(
+		ctx,
+		http.StatusInternalServerError,
+		model.INTERNAL_ERROR,
+		"internal server error",
+		map[string]any{
+			"method": ctx.Request.Method,
+		},
+	)
+}
+
+func InternalServerErrorLog(ctx *gin.Context, l *zap.Logger, err error) {
+	InternalServerError(ctx, err)
+	l.Error(err.Error())
 }
